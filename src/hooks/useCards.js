@@ -7,29 +7,30 @@ function useCards(quantity = 5) {
   
   useEffect(() => {
     const fetchImgs = async () => {
+      const query = "animals"
+      
       try {
         setLoading(true)
         setError(null)
 
         const imgs = []
-        const res = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${import.meta.env.VITE_GIPHY_API_KEY}&limit=${quantity}&offset=0&rating=g&bundle=messaging_non_clips`);
+        const res = await fetch(`https://api.unsplash.com/photos/random?query=${query}&count=${quantity}&client_id=${import.meta.env.VITE_UNSPLASH_API_KEY}`);
 
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
 
-        const result = await res.json()
+        const data = await res.json()
         
-        const data = result.data
         data.forEach(item => {
-          imgs.push({ id: crypto.randomUUID(),clicked: false, imgUrl: item.images.fixed_height_small.url })
+          imgs.push({ id: crypto.randomUUID(), clicked: false, imgUrl: `${item.urls.raw}&w=300&h=300&fit=crop&crop=entropy` })
         });
 
-        
         setCards(imgs)
-        setLoading(false)
       } catch (e) {
         setError(e)
+      } finally {
+        setLoading(false)
       }
     } 
 
