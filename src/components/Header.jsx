@@ -1,10 +1,10 @@
 import { css, cx } from "../../styled-system/css"
 import { container } from "../../styled-system/patterns"
-import ScoreBoard from "./ScoreBoard"
+import ScoreBoard from "./ui/ScoreBoard"
 
 function Header({level, streak, remainCards}) {
   return (
-    <header className={cx(css({display: "flex", py: "2",  shadow: "7px 7px 0px 1px black", border: "3px solid black", justifyContent: "space-between"}), container())}>
+    <header className={cx(css({display: "flex", py: "2", shadow: "7px 7px 0px 1px black", border: "3px solid black", justifyContent: "space-between"}), container())}>
       <h1 className={css({color: "white", fontWeight: "bold", fontSize: "4xl", fontStyle: "italic"})}>Memory Cards</h1>
       <div className={css({display: "flex", gap: "4"})}>
         <ScoreBoard variant="muted">
