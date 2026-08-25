@@ -7,7 +7,7 @@ function useCards(quantity = 5) {
   
   useEffect(() => {
     const fetchImgs = async () => {
-      const query = "animals"
+      const query = "retro"
       
       try {
         setLoading(true)
