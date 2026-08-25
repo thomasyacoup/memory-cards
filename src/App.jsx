@@ -1,95 +1,70 @@
+import useCards from "./hooks/useCards";
+import { css } from '../styled-system/css'
 import { useEffect, useState } from "react";
-import "./App.css";
-import ScoreBoard from "./components/ScoreBoard";
-import CardsContainer from "./components/CardsContainer";
+import shuffle from "./utils/shuffle";
+import Header from "./components/Header";
+import Cards from "./components/Cards";
+import Footer from "./components/Footer";
+
 
 function App() {
-  // eslint-disable-next-line no-unused-vars
-  const [state, setState] = useState("normal");
-  const [imgs, setImgs] = useState([]);
-  const [score, setScore] = useState(0);
-  const [highestScore, setHighestScore] = useState(
-    parseInt(localStorage.getItem("highestScore")) || 0
-  );
-  const [tryNumber, setTryNumber] = useState(0);
+  const [quantity, setQuantity] = useState(8)
+  
+  const { cards, setCards, loading } = useCards(quantity)
 
-  useEffect(() => {
-    localStorage.setItem("highestScore", `${highestScore}`);
-  }, [highestScore]);
+  const [level, setLevel] = useState(1) // 1, 2 or 3 
+  const [remainCards, setRemainCards] = useState(8) // 8 -> 12 -> 16 -> win
+  const [streak, setStreak] = useState(0)
 
-  useEffect(() => {
-    if (!localStorage.getItem("highestScore")) {
-      localStorage.setItem("highestScore", "0");
-    }
+  const resetGame = () => {
+    setLevel(1)
+    setRemainCards(8)
+    setStreak(0)
+    setQuantity(8)
 
-    fetch("https://boringapi.com/api/v1/photos/random?num=10")
-      .then((res) => res.json())
-      .then((data) => {
-        const photos = data.photos;
-        const newImgs = [];
-        photos.forEach((photo) => {
-          newImgs.push({ clicked: false, url: photo.url });
-        });
-        setImgs(newImgs);
-      });
-  }, []);
-
-  useEffect(() => {
-    setScore(0);
-    imgs.forEach((img) => (img.clicked = false));
-    setState("normal");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tryNumber]);
-
-  useEffect(() => {
-    if (score > highestScore) {
-      setHighestScore(score);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score]);
-
-  function handleCardClick(index) {
-    const shuffle = (array) => {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    };
-
-    if (imgs[index].clicked) {
-      setState("lose");
-      const shuffledArray = shuffle(imgs);
-      setImgs(shuffledArray);
-      setTryNumber(tryNumber + 1);
-    } else {
-      const newImgs = [...imgs];
-      newImgs[index].clicked = true;
-      const shuffledArray = shuffle(newImgs);
-      setImgs(shuffledArray);
-      setScore(score + 1);
-      if (newImgs.every((img) => img.clicked)) {
-        setState("win");
-        setTryNumber(tryNumber + 1);
-      }
-    }
+    setCards(cards.map(card => {card.clicked = false; return card}))
   }
 
-  function resetProgress() {
-    setHighestScore(0);
+  const handleCardClick = async (card) => {
+    if (card.clicked) return resetGame();
+
+    card.clicked = true
+    setRemainCards(remainCards - 1)
+    setStreak(streak + 1)   
+
+    const shuffledCards = shuffle(cards)
+    setCards(shuffledCards)
   }
+
+  useEffect(() => {
+    if (level == 3 && remainCards == 0) {
+      resetGame() // player finished the game
+    }
+    if (remainCards == 0) {
+      const newQuantity = 8 + 4 * (level) // if you finished level 1: new cards = 8 + 4 = 12 card for level 2 
+                                          // the level state still the old state and didn't change to the next level (or the next state)
+      
+      setLevel(level + 1)
+      setRemainCards(newQuantity)
+      setQuantity(newQuantity)
+    }
+  }, [level, remainCards])
 
   return (
-    <main>
-      <header>
-        <h1>Memory Card</h1>
-        <ScoreBoard
-          score={score}
-          highestScore={highestScore}
-          reset={resetProgress}
-        />
-      </header>
-      <CardsContainer imgs={imgs} handleClick={handleCardClick} />
+    <main className={css({minH: "100vh", bg:"neutral.900", display: "flex", flexDir: "column", gap: "6"})}>
+
+      <Header streak={streak} level={level} remainCards={remainCards}/>
+      <Cards>
+        {
+          loading ? "loading" :
+          cards.map(card => (
+            <Cards.Card key={card.id} onClick={() => handleCardClick(card)}>
+              <Cards.CardImg imgUrl={card.imgUrl} />
+            </Cards.Card>
+          ))
+        }
+      </Cards>
+      <Footer />
     </main>
   );
 }
