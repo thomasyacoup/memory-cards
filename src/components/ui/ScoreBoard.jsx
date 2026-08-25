@@ -36,16 +36,27 @@ function ScoreBoard({ children, variant }) {
       justifyContent: "center",
       px: "4",
       textAlign: "center",
+      transition: "transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease",
+      _hover: {
+        transform: "translate(-2px, -2px)",
+        shadow: "5px 5px 0px 1px black",
+      },
     },
     variants: {
       variant: {
         primary: {
           bg: "yellow.300",
-          color: "black"
+          color: "black",
+          _hover: {
+            bg: "yellow.400",
+          },
         },
         muted: {
           bg: "neutral.800",
-          color: "white"
+          color: "white",
+          _hover: {
+            bg: "neutral.700",
+          },
         }
       }
     }
