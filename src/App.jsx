@@ -5,6 +5,7 @@ import shuffle from "./utils/shuffle";
 import Header from "./components/Header";
 import Cards from "./components/Cards";
 import Footer from "./components/Footer";
+import GameOverlay from "./components/GameOverlay";
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   
   const { cards, setCards, loading } = useCards(quantity)
 
+  const [gameStatus, setGameStatus] = useState("playing")
   const [level, setLevel] = useState(1) // 1, 2 or 3 
   const [remainCards, setRemainCards] = useState(8) // 8 -> 12 -> 16 -> win
   const [streak, setStreak] = useState(0)
@@ -21,12 +23,20 @@ function App() {
     setRemainCards(8)
     setStreak(0)
     setQuantity(8)
+    setGameStatus("playing")
 
-    setCards(cards.map(card => {card.clicked = false; return card}))
+    const newCards = shuffle(cards.map(card => {card.clicked = false; return card})) // reset the cards and shuffle it
+
+    setCards(newCards)
   }
 
   const handleCardClick = async (card) => {
-    if (card.clicked) return resetGame();
+    if (gameStatus != "playing") return;
+
+    if (card.clicked) {
+      setGameStatus("lost")
+      return
+    };
 
     card.clicked = true
     setRemainCards(remainCards - 1)
@@ -38,8 +48,10 @@ function App() {
 
   useEffect(() => {
     if (level == 3 && remainCards == 0) {
-      resetGame() // player finished the game
+      setGameStatus("won")
+      return;
     }
+
     if (remainCards == 0) {
       const newQuantity = 8 + 4 * (level) // if you finished level 1: new cards = 8 + 4 = 12 card for level 2 
                                           // the level state still the old state and didn't change to the next level (or the next state)
@@ -65,6 +77,7 @@ function App() {
         }
       </Cards>
       <Footer />
+      <GameOverlay status={gameStatus} onRestart={resetGame} />
     </main>
   );
 }
