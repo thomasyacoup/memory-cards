@@ -1,4 +1,4 @@
-import { css, cva } from "../../styled-system/css";
+import { css, cva } from "../../../styled-system/css";
 
 function Title({children}) {
   const style = css({
