@@ -3,11 +3,12 @@ import { container } from "../../styled-system/patterns";
 
 function Cards({children}) {
   const style = css({
+    w: "full", 
     display: "grid",
     gridTemplateColumns: "repeat(4, auto)",
     gap: "4",
     justifyContent: "space-between",
-    py: "4"
+    flexGrow: 1,
   })
 
   return (
@@ -19,8 +20,8 @@ function Cards({children}) {
 
 function Card({children, onClick}) {
   const style = css({
-    w: "230px",
-    h: "230px",
+    w: "280px",
+    h: "280px",
     bg: "neutral.800",
     border: "5px solid black",
     shadow: "8px 8px 0px 1px black"
