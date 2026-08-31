@@ -5,10 +5,12 @@ function Cards({children}) {
   const style = css({
     w: "full", 
     display: "grid",
-    gridTemplateColumns: "repeat(4, auto)",
     gap: "4",
-    justifyContent: "space-between",
+    alignItems: "center",
+    justifyContent: 'center',
     flexGrow: 1,
+    gridTemplateColumns: "repeat(2, 1fr)",
+    md: {gridTemplateColumns: "repeat(4, 1fr)"},
   })
 
   return (
@@ -21,8 +23,6 @@ function Cards({children}) {
 function Card({children, onClick, clicked}) {
   const style = cva({
     base: {
-      w: "280px",
-      h: "280px",
       bg: "neutral.800",
       border: "5px solid black",
       shadow: "8px 8px 0px 1px black",
